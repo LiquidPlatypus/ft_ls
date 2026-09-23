@@ -5,6 +5,7 @@
 # include <sys/stat.h>
 # include <dirent.h>
 # include <sys/types.h>
+# include <stdint.h>
 
 # include "libft/libft.h"
 
@@ -25,5 +26,8 @@ typedef struct s_args {
 	int		flags;
 	char	**paths;
 } t_args;
+
+t_args	parse_args(int ac, char **av);
+int		compare(const void *a, const void *b);
 
 #endif //FT_LS_H
