@@ -32,6 +32,9 @@ int ls(int flags, char *path) {
 	closedir(dir);
 	qsort(names, count, sizeof(char *), compare);
 
+	if (flags & r)
+		reverse_names(names, count);
+
 	int first = TRUE;
 	i = 0;
 	while (names[i] != NULL) {
