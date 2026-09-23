@@ -4,7 +4,8 @@ CFLAGS = -Wall -Wextra -Werror -I includes
 
 LIBFT = ./libft/libft.a
 
-SRCS = main.c
+SRCS =	main.c\
+		utils.c
 
 OBJS = ${SRCS:.c=.o}
 
