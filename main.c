@@ -1,62 +1,54 @@
 #include "ft_ls.h"
 
-t_args parse_args(int ac, char **av)
-{
-	t_args	args;
-	int		i;
-	int		path_count;
-
-	args.flags = 0;
-	args.paths = malloc(sizeof(char *) * (ac + 1));
-	path_count = 0;
-	i = 1;
-	while (i < ac)
-	{
-		if (av[i][0] == '-')
-		{
-			if (ft_strchr(av[i], 'l'))
-				args.flags |= l;
-			if (ft_strchr(av[i], 'R'))
-				args.flags |= R;
-			if (ft_strchr(av[i], 'r'))
-				args.flags |= r;
-			if (ft_strchr(av[i], 'a'))
-				args.flags |= a;
-			if (ft_strchr(av[i], 't'))
-				args.flags |= t;
-		}
-		else
-			args.paths[path_count++] = av[i];
-		i++;
-	}
-	if (path_count == 0)
-		args.paths[path_count++] = ".";
-	args.paths[path_count] = NULL;
-	return (args);
-}
 
 int ls(int flags, char *path) {
 
 	DIR *dir;
 	struct dirent *entry;
+	char **names;
 
 	if ((dir = opendir(path)) == NULL) {
 		perror(path);
 		return 1;
 	}
 
-	int first = TRUE;
+	int count = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_name[0] == '.' && !(flags & a))
 			continue;
-		if (first == TRUE)
-			printf("%s", entry->d_name);
+		count++;
+	}
+	rewinddir(dir);
+
+	names = malloc(sizeof(char *) * (count + 1));
+
+	int i = 0;
+	while ((entry = readdir(dir)) != NULL) {
+		if (entry->d_name[0] == '.' && !(flags & a))
+			continue;
+		names[i++] = ft_strdup(entry->d_name);
+	}
+	names[i] = NULL;
+	closedir(dir);
+	qsort(names, count, sizeof(char *), compare);
+
+	int first = TRUE;
+	i = 0;
+	while (names[i] != NULL) {
+		if (first)
+			printf("%s", names[i]);
 		else
-			printf("  %s", entry->d_name);
+			printf("  %s", names[i]);
 		first = FALSE;
+		i++;
 	}
 	printf("\n");
-	closedir(dir);
+
+	i = 0;
+	while (names[i] != NULL)
+		free(names[i++]);
+	free(names);
+
 	return 0;
 }
 
