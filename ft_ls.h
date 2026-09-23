@@ -29,5 +29,6 @@ typedef struct s_args {
 
 t_args	parse_args(int ac, char **av);
 int		compare(const void *a, const void *b);
+void	reverse_names(char **names, int count);
 
 #endif //FT_LS_H

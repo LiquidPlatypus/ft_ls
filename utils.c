@@ -40,3 +40,19 @@ t_args parse_args(int ac, char **av)
 int compare(const void *a, const void *b) {
 	return ft_strncmp(*(char **)a, *(char **)b, SIZE_MAX);
 }
+
+
+void reverse_names(char **names, int count)
+{
+	int   i;
+	char *tmp;
+
+	i = 0;
+	while (i < count / 2)
+	{
+		tmp = names[i];
+		names[i] = names[count - 1 - i];
+		names[count - 1 - i] = tmp;
+		i++;
+	}
+}
