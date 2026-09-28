@@ -3,16 +3,19 @@
 
 int ls(int flags, char *path) {
 
-	DIR *dir;
-	struct dirent *entry;
-	char **names;
+	DIR				*dir;
+	struct dirent	*entry;
+	t_entry			*entries;
+	int				count;
+	int				i;
+	char			*tmp;
 
 	if ((dir = opendir(path)) == NULL) {
 		perror(path);
 		return 1;
 	}
 
-	int count = 0;
+	count = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_name[0] == '.' && !(flags & a))
 			continue;
@@ -20,38 +23,45 @@ int ls(int flags, char *path) {
 	}
 	rewinddir(dir);
 
-	names = malloc(sizeof(char *) * (count + 1));
+	entries = malloc(sizeof(t_entry) * (count + 1));
 
-	int i = 0;
+	i = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_name[0] == '.' && !(flags & a))
 			continue;
-		names[i++] = ft_strdup(entry->d_name);
+		entries[i].name = ft_strdup(entry->d_name);
+		tmp = ft_strjoin(path, "/");
+		entries[i].fullpath = ft_strjoin(tmp, entry->d_name);
+		free(tmp);
+		i++;
 	}
-	names[i] = NULL;
 	closedir(dir);
-	qsort(names, count, sizeof(char *), compare);
-
+	entries[i].name = NULL;
+	entries[i].fullpath = NULL;
+	if (flags & t)
+		qsort(entries, count, sizeof(t_entry), compare_time);
+	else
+		qsort(entries, count, sizeof(t_entry), compare);
 	if (flags & r)
-		reverse_names(names, count);
+		reverse_entries(entries, count);
 
-	int first = TRUE;
 	i = 0;
-	while (names[i] != NULL) {
-		if (first)
-			printf("%s", names[i]);
+	while (entries[i].name != NULL) {
+		if (i == 0)
+			printf("%s", entries[i].name);
 		else
-			printf("  %s", names[i]);
-		first = FALSE;
+			printf("  %s", entries[i].name);
 		i++;
 	}
 	printf("\n");
 
 	i = 0;
-	while (names[i] != NULL)
-		free(names[i++]);
-	free(names);
-
+	while (entries[i].name != NULL) {
+		free(entries[i].name);
+		free(entries[i].fullpath);
+		i++;
+	}
+	free(entries);
 	return 0;
 }
 
