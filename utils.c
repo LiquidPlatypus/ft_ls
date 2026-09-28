@@ -53,8 +53,8 @@ int compare_time(const void *a, const void *b) {
 	struct stat sa;
 	struct stat sb;
 
-	stat(ea->fullpath, &sa);
-	stat(eb->fullpath, &sb);
+	lstat(ea->fullpath, &sa);
+	lstat(eb->fullpath, &sb);
 
 	if (sa.st_mtime == sb.st_mtime) {
 		if (sa.st_mtim.tv_nsec == sb.st_mtim.tv_nsec)
