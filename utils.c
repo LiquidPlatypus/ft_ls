@@ -38,21 +38,44 @@ t_args parse_args(int ac, char **av)
 
 
 int compare(const void *a, const void *b) {
-	return ft_strncmp(*(char **)a, *(char **)b, SIZE_MAX);
+	t_entry *ea;
+	t_entry *eb;
+
+	ea = (t_entry *)a;
+	eb = (t_entry *)b;
+	return ft_strncmp(ea->name, eb->name, SIZE_MAX);
 }
 
 
-void reverse_names(char **names, int count)
+int compare_time(const void *a, const void *b) {
+	t_entry	*ea = (t_entry *)a;
+	t_entry	*eb = (t_entry *)b;
+	struct stat sa;
+	struct stat sb;
+
+	stat(ea->fullpath, &sa);
+	stat(eb->fullpath, &sb);
+
+	if (sa.st_mtime == sb.st_mtime) {
+		if (sa.st_mtim.tv_nsec == sb.st_mtim.tv_nsec)
+			return ft_strncmp(ea->name, eb->name, SIZE_MAX);
+		return (sa.st_mtim.tv_nsec < sb.st_mtim.tv_nsec ? 1 : (sa.st_mtim.tv_nsec > sb.st_mtim.tv_nsec ? -1 : 0));
+	}
+	return (sa.st_mtime < sb.st_mtime ? 1 : (sa.st_mtime > sb.st_mtime ? -1 : 0));
+}
+
+
+void reverse_entries(t_entry *entries, int count)
 {
 	int   i;
-	char *tmp;
+	t_entry tmp;
 
 	i = 0;
 	while (i < count / 2)
 	{
-		tmp = names[i];
-		names[i] = names[count - 1 - i];
-		names[count - 1 - i] = tmp;
+		tmp = entries[i];
+		entries[i] = entries[count - 1 - i];
+		entries[count - 1 - i] = tmp;
 		i++;
 	}
 }
