@@ -27,8 +27,14 @@ typedef struct s_args {
 	char	**paths;
 } t_args;
 
+typedef struct s_entry {
+	char	*name;
+	char	*fullpath;
+} t_entry;
+
 t_args	parse_args(int ac, char **av);
 int		compare(const void *a, const void *b);
-void	reverse_names(char **names, int count);
+int		compare_time(const void *a, const void *b);
+void	reverse_entries(t_entry *entries, int count);
 
 #endif //FT_LS_H
