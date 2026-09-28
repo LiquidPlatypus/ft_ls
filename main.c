@@ -45,6 +45,8 @@ int ls(int flags, char *path) {
 	if (flags & r)
 		reverse_entries(entries, count);
 
+	if (flags & R)
+		printf("%s:\n", path);
 	i = 0;
 	while (entries[i].name != NULL) {
 		if (i == 0)
@@ -54,6 +56,18 @@ int ls(int flags, char *path) {
 		i++;
 	}
 	printf("\n");
+
+	if (flags & R) {
+		for (i = 0; entries[i].name != NULL; i++) {
+			if (!ft_strncmp(".", entries[i].name, SIZE_MAX) || !ft_strncmp("..", entries[i].name, SIZE_MAX))
+				continue;
+			struct stat st;
+			if (lstat(entries[i].fullpath, &st) == 0 && S_ISDIR(st.st_mode)) {
+				printf("\n");
+				ls(flags, entries[i].fullpath);
+			}
+		}
+	}
 
 	i = 0;
 	while (entries[i].name != NULL) {
