@@ -47,15 +47,55 @@ int ls(int flags, char *path) {
 
 	if (flags & R)
 		printf("%s:\n", path);
-	i = 0;
-	while (entries[i].name != NULL) {
-		if (i == 0)
-			printf("%s", entries[i].name);
-		else
-			printf("  %s", entries[i].name);
-		i++;
+
+	if (flags & l)
+	{
+		i = 0;
+		while (entries[i].name != NULL)
+		{
+			struct stat st;
+			char perms[11];
+			int masks[9] = {S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+			char letters[3] = {'r', 'w', 'x'};
+			int j;
+
+			if (lstat(entries[i].fullpath, &st) == -1) {
+				perror(entries[i].fullpath);
+				i++;
+				continue;
+			}
+			if (S_ISDIR(st.st_mode))
+				perms[0] = 'd';
+			else if (S_ISLNK(st.st_mode))
+				perms[0] = 'l';
+			else
+				perms[0] = '-';
+			j = 0;
+			while (j < 9)
+			{
+				if (st.st_mode & masks[j])
+					perms[j + 1] = letters[j % 3];
+				else
+					perms[j + 1] = '-';
+				j++;
+			}
+			perms[10] = '\0';
+			printf("%s %s\n", perms, entries[i].name);
+			i++;
+		}
 	}
-	printf("\n");
+	else
+	{
+		i = 0;
+		while (entries[i].name != NULL) {
+			if (i == 0)
+				printf("%s", entries[i].name);
+			else
+				printf("  %s", entries[i].name);
+			i++;
+		}
+		printf("\n");
+	}
 
 	if (flags & R) {
 		for (i = 0; entries[i].name != NULL; i++) {
