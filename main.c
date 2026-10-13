@@ -48,8 +48,7 @@ int ls(int flags, char *path) {
 	if (flags & R)
 		printf("%s:\n", path);
 
-	if (flags & l)
-	{
+	if (flags & l) {
 		i = 0;
 		while (entries[i].name != NULL)
 		{
@@ -84,8 +83,7 @@ int ls(int flags, char *path) {
 			i++;
 		}
 	}
-	else
-	{
+	else {
 		i = 0;
 		while (entries[i].name != NULL) {
 			if (i == 0)
