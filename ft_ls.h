@@ -6,6 +6,9 @@
 # include <dirent.h>
 # include <sys/types.h>
 # include <stdint.h>
+# include <pwd.h>
+# include <grp.h>
+# include <time.h>
 
 # include "libft/libft.h"
 
