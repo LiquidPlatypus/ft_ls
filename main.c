@@ -21,6 +21,7 @@ int ls(int flags, char *path) {
 		return 1;
 	}
 
+	// Count the number of files in the directory.
 	count = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_name[0] == '.' && !(flags & a))
@@ -31,6 +32,7 @@ int ls(int flags, char *path) {
 
 	entries = malloc(sizeof(t_entry) * (count + 1));
 
+	// Read the directory entries into the array.
 	i = 0;
 	while ((entry = readdir(dir)) != NULL) {
 		if (entry->d_name[0] == '.' && !(flags & a))
@@ -44,6 +46,7 @@ int ls(int flags, char *path) {
 	closedir(dir);
 	entries[i].name = NULL;
 	entries[i].fullpath = NULL;
+	// Sort the entries based on the flags.
 	if (flags & t)
 		qsort(entries, count, sizeof(t_entry), compare_time);
 	else
@@ -54,9 +57,11 @@ int ls(int flags, char *path) {
 	if (flags & R)
 		printf("%s:\n", path);
 
+	// Display the entries based on the flags.
 	if (flags & l) {
 		i = 0;
 		int total_blocks = 0;
+		// Calculate total blocks for the directory.
 		while (entries[i].name != NULL) {
 			struct stat st;
 			if (lstat(entries[i].fullpath, &st) == -1) {
@@ -69,21 +74,24 @@ int ls(int flags, char *path) {
 		}
 		printf("total %d\n", total_blocks / 2);
 
+		// Display the entries in long format.
 		i = 0;
 		while (entries[i].name != NULL)
 		{
 			struct stat st;
 			char perms[11];
+			// Define the permission masks and corresponding letters for user, group, and others.
 			int masks[9] = {S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
 			char letters[3] = {'r', 'w', 'x'};
 			int j;
-
+			// Get the file status using lstat.
 			if (lstat(entries[i].fullpath, &st) == -1) {
 				perror(entries[i].fullpath);
 				i++;
 				continue;
 			}
 			display_name = NULL;
+			// Determine the file type and set the first character of the permissions string accordingly.
 			if (S_ISDIR(st.st_mode))
 				perms[0] = 'd';
 			else if (S_ISLNK(st.st_mode)) {
@@ -100,6 +108,7 @@ int ls(int flags, char *path) {
 			}
 			else
 				perms[0] = '-';
+			// Set the permission bits for the file.
 			j = 0;
 			while (j < 9)
 			{
@@ -111,6 +120,7 @@ int ls(int flags, char *path) {
 			}
 			perms[10] = '\0';
 
+			// Get the user and group names.
 			pwd = getpwuid(st.st_uid);
 			char *user_name = pwd ? pwd->pw_name : ft_itoa(st.st_uid);
 			grp = getgrgid(st.st_gid);
@@ -145,6 +155,7 @@ int ls(int flags, char *path) {
 		printf("\n");
 	}
 
+	// If the -R flag is set, recursively list subdirectories.
 	if (flags & R) {
 		for (i = 0; entries[i].name != NULL; i++) {
 			if (!ft_strncmp(".", entries[i].name, SIZE_MAX) || !ft_strncmp("..", entries[i].name, SIZE_MAX))
@@ -157,6 +168,7 @@ int ls(int flags, char *path) {
 		}
 	}
 
+	// Free allocated memory for entries.
 	i = 0;
 	while (entries[i].name != NULL) {
 		free(entries[i].name);
