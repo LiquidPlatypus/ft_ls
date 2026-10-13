@@ -9,6 +9,12 @@ int ls(int flags, char *path) {
 	int				count;
 	int				i;
 	char			*tmp;
+	struct passwd	*pwd;
+	struct group	*grp;
+	struct tm		*tm_info;
+
+	char			target[PATH_MAX];
+	char			*display_name;
 
 	if ((dir = opendir(path)) == NULL) {
 		perror(path);
@@ -50,6 +56,20 @@ int ls(int flags, char *path) {
 
 	if (flags & l) {
 		i = 0;
+		int total_blocks = 0;
+		while (entries[i].name != NULL) {
+			struct stat st;
+			if (lstat(entries[i].fullpath, &st) == -1) {
+				perror(entries[i].fullpath);
+				i++;
+				continue;
+			}
+			total_blocks += st.st_blocks;
+			i++;
+		}
+		printf("total %d\n", total_blocks / 2);
+
+		i = 0;
 		while (entries[i].name != NULL)
 		{
 			struct stat st;
@@ -63,10 +83,21 @@ int ls(int flags, char *path) {
 				i++;
 				continue;
 			}
+			display_name = NULL;
 			if (S_ISDIR(st.st_mode))
 				perms[0] = 'd';
-			else if (S_ISLNK(st.st_mode))
+			else if (S_ISLNK(st.st_mode)) {
 				perms[0] = 'l';
+				ssize_t len = readlink(entries[i].fullpath, target, sizeof(target) - 1);
+				if (len == -1) {
+					perror(entries[i].fullpath);
+				} else {
+					target[len] = '\0';
+					char *tmp = ft_strjoin(entries[i].name, " -> ");
+					display_name = ft_strjoin(tmp, target);
+					free(tmp);
+				}
+			}
 			else
 				perms[0] = '-';
 			j = 0;
@@ -79,7 +110,26 @@ int ls(int flags, char *path) {
 				j++;
 			}
 			perms[10] = '\0';
-			printf("%s %s\n", perms, entries[i].name);
+
+			pwd = getpwuid(st.st_uid);
+			char *user_name = pwd ? pwd->pw_name : ft_itoa(st.st_uid);
+			grp = getgrgid(st.st_gid);
+			char *group_name = grp ? grp->gr_name : ft_itoa(st.st_gid);
+
+			tm_info = localtime(&st.st_mtime);
+			char buffer[20];
+			strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
+
+			if (!display_name)
+				display_name = ft_strdup(entries[i].name);
+
+			printf("%s %ld %s %s %ld %s %s\n", perms, st.st_nlink, user_name,
+											group_name, st.st_size, buffer, display_name);
+			if (!pwd)
+				free(user_name);
+			if (!grp)
+				free(group_name);
+			free(display_name);
 			i++;
 		}
 	}
