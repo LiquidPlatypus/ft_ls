@@ -153,6 +153,7 @@ void print_entries(t_entry *entries, int flags)
 					char *tmp = ft_strjoin("\'", entries[i].name);
 					tmp = ft_strjoin(tmp, "\'");
 					display_name = tmp;
+					free(tmp);
 				}
 				else
 					display_name = ft_strdup(entries[i].name);
@@ -176,6 +177,7 @@ void print_entries(t_entry *entries, int flags)
 				char *tmp = ft_strjoin("\'", entries[i].name);
 				tmp = ft_strjoin(tmp, "\'");
 				entries[i].name = tmp;
+				free(tmp);
 			}
 			else
 				printf("%s", entries[i].name);
