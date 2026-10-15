@@ -84,3 +84,92 @@ void reverse_entries(t_entry *entries, int count)
 		i++;
 	}
 }
+
+
+void print_entries(t_entry *entries, int flags)
+{
+	int i;
+
+	if (flags & l)
+	{
+		i = 0;
+		while (entries[i].name != NULL)
+		{
+			struct stat st;
+			char perms[11];
+			int masks[9] = {S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+			char letters[3] = {'r', 'w', 'x'};
+			int j;
+			struct passwd *pwd;
+			struct group *grp;
+			struct tm *tm_info;
+			char target[PATH_MAX];
+			char *display_name;
+
+			if (lstat(entries[i].fullpath, &st) == -1) {
+				perror(entries[i].fullpath);
+				i++;
+				continue;
+			}
+			display_name = NULL;
+			if (S_ISDIR(st.st_mode))
+				perms[0] = 'd';
+			else if (S_ISLNK(st.st_mode)) {
+				perms[0] = 'l';
+				ssize_t len = readlink(entries[i].fullpath, target, sizeof(target) - 1);
+				if (len == -1) {
+					perror(entries[i].fullpath);
+				} else {
+					target[len] = '\0';
+					char *tmp2 = ft_strjoin(entries[i].name, " -> ");
+					display_name = ft_strjoin(tmp2, target);
+					free(tmp2);
+				}
+			}
+			else
+				perms[0] = '-';
+			j = 0;
+			while (j < 9)
+			{
+				if (st.st_mode & masks[j])
+					perms[j + 1] = letters[j % 3];
+				else
+					perms[j + 1] = '-';
+				j++;
+			}
+			perms[10] = '\0';
+
+			pwd = getpwuid(st.st_uid);
+			char *user_name = pwd ? pwd->pw_name : ft_itoa(st.st_uid);
+			grp = getgrgid(st.st_gid);
+			char *group_name = grp ? grp->gr_name : ft_itoa(st.st_gid);
+
+			tm_info = localtime(&st.st_mtime);
+			char buffer[20];
+			strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
+
+			if (!display_name)
+				display_name = ft_strdup(entries[i].name);
+
+			printf("%s %ld %s %s %ld %s %s\n", perms, st.st_nlink, user_name,
+									group_name, st.st_size, buffer, display_name);
+			if (!pwd)
+				free(user_name);
+			if (!grp)
+				free(group_name);
+			free(display_name);
+			i++;
+		}
+	}
+	else {
+		i = 0;
+		while (entries[i].name != NULL) {
+			if (i == 0)
+				printf("%s", entries[i].name);
+			else
+				printf("  %s", entries[i].name);
+			i++;
+		}
+		printf("\n");
+	}
+}
