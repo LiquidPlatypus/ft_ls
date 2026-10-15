@@ -148,8 +148,15 @@ void print_entries(t_entry *entries, int flags)
 			char buffer[20];
 			strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
 
-			if (!display_name)
-				display_name = ft_strdup(entries[i].name);
+			if (!display_name) {
+				if (ft_strchr(entries[i].name, ' ')) {
+					char *tmp = ft_strjoin("\'", entries[i].name);
+					tmp = ft_strjoin(tmp, "\'");
+					display_name = tmp;
+				}
+				else
+					display_name = ft_strdup(entries[i].name);
+			}
 
 			printf("%s %ld %s %s %ld %s %s\n", perms, st.st_nlink, user_name,
 									group_name, st.st_size, buffer, display_name);
@@ -164,6 +171,13 @@ void print_entries(t_entry *entries, int flags)
 	else {
 		i = 0;
 		while (entries[i].name != NULL) {
+			if (ft_strchr(entries[i].name, ' ')) {
+				char *tmp = ft_strjoin("\'", entries[i].name);
+				tmp = ft_strjoin(tmp, "\'");
+				entries[i].name = tmp;
+			}
+			else
+				printf("%s", entries[i].name);
 			if (i == 0)
 				printf("%s", entries[i].name);
 			else
