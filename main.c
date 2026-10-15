@@ -1,7 +1,7 @@
 #include "ft_ls.h"
 
 
-int ls(int flags, char *path) {
+int ls(int flags, char *path, int path_count) {
 
 	DIR				*dir;
 	struct dirent	*entry;
@@ -58,7 +58,8 @@ int ls(int flags, char *path) {
 	if (flags & r)
 		reverse_entries(entries, count);
 
-	if (flags & R)
+	// Header shown with -R, or when more than one path was given on the command line.
+	if ((flags & R) || path_count > 1)
 		printf("%s:\n", path);
 
 	// Display the entries based on the flags.
@@ -100,14 +101,15 @@ int ls(int flags, char *path) {
 				perms[0] = 'd';
 			else if (S_ISLNK(st.st_mode)) {
 				perms[0] = 'l';
+				// Read the symlink target to append "-> target" to the name.
 				ssize_t len = readlink(entries[i].fullpath, target, sizeof(target) - 1);
 				if (len == -1) {
 					perror(entries[i].fullpath);
 				} else {
 					target[len] = '\0';
-					char *tmp = ft_strjoin(entries[i].name, " -> ");
-					display_name = ft_strjoin(tmp, target);
-					free(tmp);
+					char *tmp2 = ft_strjoin(entries[i].name, " -> ");
+					display_name = ft_strjoin(tmp2, target);
+					free(tmp2);
 				}
 			}
 			else
@@ -134,11 +136,13 @@ int ls(int flags, char *path) {
 			char buffer[20];
 			strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
 
+			// Not a symlink (or readlink failed): display_name is just the name.
 			if (!display_name)
 				display_name = ft_strdup(entries[i].name);
 
 			printf("%s %ld %s %s %ld %s %s\n", perms, st.st_nlink, user_name,
 											group_name, st.st_size, buffer, display_name);
+			// Only free user_name/group_name if they came from ft_itoa (pwd/grp was NULL).
 			if (!pwd)
 				free(user_name);
 			if (!grp)
@@ -165,9 +169,10 @@ int ls(int flags, char *path) {
 			if (!ft_strncmp(".", entries[i].name, SIZE_MAX) || !ft_strncmp("..", entries[i].name, SIZE_MAX))
 				continue;
 			struct stat st;
+			// lstat (not stat) so symlinks are never followed, avoiding infinite recursion.
 			if (lstat(entries[i].fullpath, &st) == 0 && S_ISDIR(st.st_mode)) {
 				printf("\n");
-				ls(flags, entries[i].fullpath);
+				ls(flags, entries[i].fullpath, path_count);
 			}
 		}
 	}
@@ -187,10 +192,20 @@ int main(int ac, char **av) {
 
 	t_args args = parse_args(ac, av);
 
+	// Count how many paths were given, to decide whether headers are needed.
+	int path_count = 0;
+	while (args.paths[path_count] != NULL)
+		path_count++;
+	qsort(args.paths, path_count, sizeof(char *), compare_paths);
+
 	int i = 0;
 	int exit_code = 0;
 	while (args.paths[i] != NULL) {
-		exit_code = exit_code || ls(args.flags, args.paths[i++]);
+		// Blank line between the listings of two different paths, like the real ls.
+		if (i > 0)
+			printf("\n");
+		exit_code = exit_code || ls(args.flags, args.paths[i], path_count);
+		i++;
 	}
 
 	return exit_code;

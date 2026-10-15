@@ -37,6 +37,7 @@ typedef struct s_entry {
 
 t_args	parse_args(int ac, char **av);
 int		compare(const void *a, const void *b);
+int		compare_paths(const void *a, const void *b);
 int		compare_time(const void *a, const void *b);
 void	reverse_entries(t_entry *entries, int count);
 

@@ -47,6 +47,11 @@ int compare(const void *a, const void *b) {
 }
 
 
+int compare_paths(const void *a, const void *b) {
+	return ft_strncmp(*(char **)a, *(char **)b, SIZE_MAX);
+}
+
+
 int compare_time(const void *a, const void *b) {
 	t_entry	*ea = (t_entry *)a;
 	t_entry	*eb = (t_entry *)b;
