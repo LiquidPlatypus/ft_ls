@@ -132,5 +132,6 @@ int main(int ac, char **av) {
 		i++;
 	}
 
+	free(args.paths);
 	return exit_code;
 }
