@@ -17,7 +17,11 @@ int ls(int flags, char *path) {
 	char			*display_name;
 
 	if ((dir = opendir(path)) == NULL) {
-		perror(path);
+		char *tmp1 = ft_strjoin("ls: cannot access '", path);
+		char *tmp2 = ft_strjoin(tmp1, "'");
+		perror(tmp2);
+		free(tmp1);
+		free(tmp2);
 		return 1;
 	}
 
