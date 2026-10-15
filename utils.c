@@ -171,6 +171,7 @@ void print_entries(t_entry *entries, int flags)
 	else {
 		i = 0;
 		while (entries[i].name != NULL) {
+			// TODO: DUPLICATE WHEN DIRECTORY AS SPACE IN IT ONLY WHEN in NON -l FLAG !!!!!!!!!!
 			if (ft_strchr(entries[i].name, ' ')) {
 				char *tmp = ft_strjoin("\'", entries[i].name);
 				tmp = ft_strjoin(tmp, "\'");
