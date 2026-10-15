@@ -9,12 +9,20 @@ int ls(int flags, char *path, int path_count) {
 	int				count;
 	int				i;
 	char			*tmp;
-	struct passwd	*pwd;
-	struct group	*grp;
-	struct tm		*tm_info;
 
-	char			target[PATH_MAX];
-	char			*display_name;
+
+	struct stat st;
+	if (lstat(path, &st) == 0 && !S_ISDIR(st.st_mode)) {
+		t_entry single[2];
+		single[0].name = ft_strdup(path);
+		single[0].fullpath = ft_strdup(path);
+		single[1].name = NULL;
+		single[1].fullpath = NULL;
+		print_entries(single, flags);
+		free(single[0].name);
+		free(single[0].fullpath);
+		return 0;
+	}
 
 	if ((dir = opendir(path)) == NULL) {
 		char *tmp1 = ft_strjoin("ls: cannot access '", path);
@@ -62,106 +70,22 @@ int ls(int flags, char *path, int path_count) {
 	if ((flags & R) || path_count > 1)
 		printf("%s:\n", path);
 
-	// Display the entries based on the flags.
 	if (flags & l) {
-		i = 0;
+		// Print the total blocks for the directory.
 		int total_blocks = 0;
-		// Calculate total blocks for the directory.
-		while (entries[i].name != NULL) {
+		for (i = 0; entries[i].name != NULL; i++) {
 			struct stat st;
 			if (lstat(entries[i].fullpath, &st) == -1) {
 				perror(entries[i].fullpath);
-				i++;
 				continue;
 			}
 			total_blocks += st.st_blocks;
-			i++;
 		}
 		printf("total %d\n", total_blocks / 2);
-
-		// Display the entries in long format.
-		i = 0;
-		while (entries[i].name != NULL)
-		{
-			struct stat st;
-			char perms[11];
-			// Define the permission masks and corresponding letters for user, group, and others.
-			int masks[9] = {S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
-			char letters[3] = {'r', 'w', 'x'};
-			int j;
-			// Get the file status using lstat.
-			if (lstat(entries[i].fullpath, &st) == -1) {
-				perror(entries[i].fullpath);
-				i++;
-				continue;
-			}
-			display_name = NULL;
-			// Determine the file type and set the first character of the permissions string accordingly.
-			if (S_ISDIR(st.st_mode))
-				perms[0] = 'd';
-			else if (S_ISLNK(st.st_mode)) {
-				perms[0] = 'l';
-				// Read the symlink target to append "-> target" to the name.
-				ssize_t len = readlink(entries[i].fullpath, target, sizeof(target) - 1);
-				if (len == -1) {
-					perror(entries[i].fullpath);
-				} else {
-					target[len] = '\0';
-					char *tmp2 = ft_strjoin(entries[i].name, " -> ");
-					display_name = ft_strjoin(tmp2, target);
-					free(tmp2);
-				}
-			}
-			else
-				perms[0] = '-';
-			// Set the permission bits for the file.
-			j = 0;
-			while (j < 9)
-			{
-				if (st.st_mode & masks[j])
-					perms[j + 1] = letters[j % 3];
-				else
-					perms[j + 1] = '-';
-				j++;
-			}
-			perms[10] = '\0';
-
-			// Get the user and group names.
-			pwd = getpwuid(st.st_uid);
-			char *user_name = pwd ? pwd->pw_name : ft_itoa(st.st_uid);
-			grp = getgrgid(st.st_gid);
-			char *group_name = grp ? grp->gr_name : ft_itoa(st.st_gid);
-
-			tm_info = localtime(&st.st_mtime);
-			char buffer[20];
-			strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
-
-			// Not a symlink (or readlink failed): display_name is just the name.
-			if (!display_name)
-				display_name = ft_strdup(entries[i].name);
-
-			printf("%s %ld %s %s %ld %s %s\n", perms, st.st_nlink, user_name,
-											group_name, st.st_size, buffer, display_name);
-			// Only free user_name/group_name if they came from ft_itoa (pwd/grp was NULL).
-			if (!pwd)
-				free(user_name);
-			if (!grp)
-				free(group_name);
-			free(display_name);
-			i++;
-		}
 	}
-	else {
-		i = 0;
-		while (entries[i].name != NULL) {
-			if (i == 0)
-				printf("%s", entries[i].name);
-			else
-				printf("  %s", entries[i].name);
-			i++;
-		}
-		printf("\n");
-	}
+
+	// Display the entries based on the flags.
+	print_entries(entries, flags);
 
 	// If the -R flag is set, recursively list subdirectories.
 	if (flags & R) {

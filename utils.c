@@ -95,16 +95,16 @@ void print_entries(t_entry *entries, int flags)
 		i = 0;
 		while (entries[i].name != NULL)
 		{
-			struct stat st;
-			char perms[11];
-			int masks[9] = {S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
-			char letters[3] = {'r', 'w', 'x'};
-			int j;
-			struct passwd *pwd;
-			struct group *grp;
-			struct tm *tm_info;
-			char target[PATH_MAX];
-			char *display_name;
+			struct stat		st;
+			char			perms[11];
+			int				masks[9] = {S_IRUSR, S_IWUSR, S_IXUSR, S_IRGRP, S_IWGRP, S_IXGRP, S_IROTH, S_IWOTH, S_IXOTH};
+			char			letters[3] = {'r', 'w', 'x'};
+			int				j;
+			struct passwd	*pwd;
+			struct group	*grp;
+			struct tm		*tm_info;
+			char			target[PATH_MAX];
+			char			*display_name;
 
 			if (lstat(entries[i].fullpath, &st) == -1) {
 				perror(entries[i].fullpath);
