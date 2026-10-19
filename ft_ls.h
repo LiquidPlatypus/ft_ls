@@ -41,5 +41,6 @@ int		compare_paths(const void *a, const void *b);
 int		compare_time(const void *a, const void *b);
 void	reverse_entries(t_entry *entries, int count);
 void	print_entries(t_entry *entries, int flags);
+char	*quote_name(const char *name);
 
 #endif //FT_LS_H
