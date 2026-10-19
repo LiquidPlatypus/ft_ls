@@ -151,8 +151,7 @@ void print_entries(t_entry *entries, int flags)
 			if (!display_name) {
 				if (ft_strchr(entries[i].name, ' ')) {
 					char *tmp = ft_strjoin("\'", entries[i].name);
-					tmp = ft_strjoin(tmp, "\'");
-					display_name = tmp;
+					display_name = ft_strjoin(tmp, "\'");
 					free(tmp);
 				}
 				else
@@ -172,21 +171,24 @@ void print_entries(t_entry *entries, int flags)
 	else {
 		i = 0;
 		while (entries[i].name != NULL) {
-			// TODO: DUPLICATE WHEN DIRECTORY AS SPACE IN IT ONLY WHEN in NON -l FLAG !!!!!!!!!!
+			char *display_name;
+			char *tmp;
+
 			if (ft_strchr(entries[i].name, ' ')) {
-				char *tmp = ft_strjoin("\'", entries[i].name);
-				tmp = ft_strjoin(tmp, "\'");
-				entries[i].name = tmp;
+				tmp = ft_strjoin("'", entries[i].name);
+				display_name = ft_strjoin(tmp, "'");
 				free(tmp);
 			}
 			else
-				printf("%s", entries[i].name);
+				display_name = ft_strdup(entries[i].name);
 			if (i == 0)
-				printf("%s", entries[i].name);
+				printf("%s", display_name);
 			else
-				printf("  %s", entries[i].name);
+				printf("  %s", display_name);
+			free(display_name);
 			i++;
 		}
-		printf("\n");
+		if (i > 0)
+			printf("\n");
 	}
 }

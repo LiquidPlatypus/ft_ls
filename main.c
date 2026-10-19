@@ -128,7 +128,8 @@ int main(int ac, char **av) {
 		// Blank line between the listings of two different paths, like the real ls.
 		if (i > 0)
 			printf("\n");
-		exit_code = exit_code || ls(args.flags, args.paths[i], path_count);
+		if (ls(args.flags, args.paths[i], path_count))
+			exit_code = 1;
 		i++;
 	}
 
