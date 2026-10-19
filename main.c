@@ -129,8 +129,22 @@ int main(int ac, char **av) {
 		path_count++;
 	qsort(args.paths, path_count, sizeof(char *), compare_paths);
 
-	int i = 0;
-	int exit_code = 0;
+	int		i = 0;
+	int		j = 0;
+	int		exit_code = 0;
+	struct	stat st;
+	while (args.paths[i] != NULL) {
+		if (lstat(args.paths[i], &st) == -1) {
+			fprintf(stderr, "ls: cannot access '%s': %s\n",
+					args.paths[i], strerror(errno));
+			exit_code = 1;
+		}
+		else
+			args.paths[j++] = args.paths[i];
+		i++;
+	}
+	args.paths[j] = NULL;
+	i = 0;
 	while (args.paths[i] != NULL) {
 		// Blank line between the listings of two different paths, like the real ls.
 		if (i > 0)
