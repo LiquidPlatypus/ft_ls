@@ -12,7 +12,9 @@ int ls(int flags, char *path, int path_count) {
 
 
 	struct stat st;
-	if (lstat(path, &st) == 0 && !S_ISDIR(st.st_mode)) {
+	int lstat_result = lstat(path, &st);
+	int saved_errno = errno; // Save errno in case lstat fails
+	if (lstat_result == 0 && !S_ISDIR(st.st_mode)) {
 		t_entry single[2];
 		single[0].name = ft_strdup(path);
 		single[0].fullpath = ft_strdup(path);
@@ -25,11 +27,13 @@ int ls(int flags, char *path, int path_count) {
 	}
 
 	if ((dir = opendir(path)) == NULL) {
-		char *tmp1 = ft_strjoin("ls: cannot access '", path);
-		char *tmp2 = ft_strjoin(tmp1, "'");
-		perror(tmp2);
-		free(tmp1);
-		free(tmp2);
+		if (lstat_result == -1) {
+			// If lstat failed, print the error message for the path.
+			fprintf(stderr, "ls: cannot access '%s': %s\n", path, strerror(saved_errno));
+		} else {
+			// If lstat succeeded but opendir failed, print a generic error message.
+			fprintf(stderr, "ls: cannot open directory '%s': %s\n", path, strerror(errno));
+		}
 		return 1;
 	}
 

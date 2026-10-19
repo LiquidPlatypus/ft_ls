@@ -21,6 +21,7 @@
 # include <string.h>
 # include <unistd.h>
 # include <stdarg.h>
+# include <errno.h>
 
 typedef struct s_print
 {
