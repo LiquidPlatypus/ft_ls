@@ -67,8 +67,11 @@ int ls(int flags, char *path, int path_count) {
 		reverse_entries(entries, count);
 
 	// Header shown with -R, or when more than one path was given on the command line.
-	if ((flags & R) || path_count > 1)
-		printf("%s:\n", path);
+	if ((flags & R) || path_count > 1) {
+		char *h = quote_name(path);
+		printf("%s:\n", h);
+		free(h);
+	}
 
 	if (flags & l) {
 		// Print the total blocks for the directory.
