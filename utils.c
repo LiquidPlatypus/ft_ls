@@ -192,3 +192,16 @@ void print_entries(t_entry *entries, int flags)
 			printf("\n");
 	}
 }
+
+
+char *quote_name(const char *name) {
+	char *tmp;
+	char *quoted_name;
+
+	if (!ft_strchr(name, ' '))
+		return (ft_strdup(name));
+	tmp = ft_strjoin("'", name);
+	quoted_name = ft_strjoin(tmp, "'");
+	free(tmp);
+	return (quoted_name);
+}
