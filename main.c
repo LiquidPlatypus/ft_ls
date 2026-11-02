@@ -137,7 +137,7 @@ int main(int ac, char **av) {
 		if (lstat(args.paths[i], &st) == -1) {
 			fprintf(stderr, "ls: cannot access '%s': %s\n",
 					args.paths[i], strerror(errno));
-			exit_code = 1;
+			exit_code = 2;
 		}
 		else
 			args.paths[j++] = args.paths[i];
@@ -150,7 +150,7 @@ int main(int ac, char **av) {
 		if (i > 0)
 			printf("\n");
 		if (ls(args.flags, args.paths[i], path_count))
-			exit_code = 1;
+			exit_code = 2;
 		i++;
 	}
 
