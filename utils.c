@@ -142,6 +142,14 @@ void print_entries(t_entry *entries, int flags)
 					free(tmp2);
 				}
 			}
+			else if (S_ISCHR(st.st_mode))
+				perms[0] = 'c';
+			else if (S_ISBLK(st.st_mode))
+				perms[0] = 'b';
+			else if (S_ISFIFO(st.st_mode))
+				perms[0] = 'p';
+			else if (S_ISSOCK(st.st_mode))
+				perms[0] = 's';
 			else
 				perms[0] = '-';
 			j = 0;
