@@ -107,6 +107,7 @@ void print_entries(t_entry *entries, int flags)
 
 	if (flags & l)
 	{
+		time_t now = time(NULL);
 		i = 0;
 		while (entries[i].name != NULL)
 		{
@@ -167,7 +168,10 @@ void print_entries(t_entry *entries, int flags)
 
 			tm_info = localtime(&st.st_mtime);
 			char buffer[20];
-			strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
+			if (st.st_mtime < now - SIX_MONTHS || st.st_mtime > now)
+				strftime(buffer, sizeof(buffer), "%b %e  %Y", tm_info);
+			else
+				strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
 
 			if (!display_name) {
 				if (ft_strchr(entries[i].name, ' ')) {
