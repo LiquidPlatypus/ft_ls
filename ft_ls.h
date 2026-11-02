@@ -12,6 +12,8 @@
 
 # include "libft/libft.h"
 
+# define SIX_MONTHS 15778476
+
 enum e_bool {
 	FALSE,
 	TRUE
