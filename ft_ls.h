@@ -17,6 +17,8 @@ enum e_bool {
 	TRUE
 };
 
+# define VALID_OPTIONS "lRrat"
+
 enum e_args {
 	l = 1 << 0,
 	R = 1 << 1,

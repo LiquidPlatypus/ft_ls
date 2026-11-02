@@ -4,17 +4,32 @@
 t_args parse_args(int ac, char **av)
 {
 	t_args	args;
-	int		i;
-	int		path_count;
+	int		i = 1;
+	int		j;
+	int		path_count = 0;
+	int		is_after_doublecarret = 0;
 
 	args.flags = 0;
 	args.paths = malloc(sizeof(char *) * (ac + 1));
-	path_count = 0;
-	i = 1;
 	while (i < ac)
 	{
-		if (av[i][0] == '-')
+		j = 1;
+		if (!is_after_doublecarret && ft_strncmp(av[i], "--", SIZE_MAX) == 0) {
+			is_after_doublecarret = 1;
+			i++;
+			continue;
+		}
+		if (!is_after_doublecarret && av[i][0] == '-' && av[i][1] != '\0')
 		{
+			while (av[i][j]) {
+				if (!ft_strchr(VALID_OPTIONS, av[i][j])) {
+					fprintf(stderr, "ls: invalid option -- '%c'\n", av[i][j]);
+					fprintf(stderr, "Try 'ls --help' for more information.\n");
+					free(args.paths);
+					exit(2);
+				}
+				j++;
+			}
 			if (ft_strchr(av[i], 'l'))
 				args.flags |= l;
 			if (ft_strchr(av[i], 'R'))
@@ -137,6 +152,12 @@ void print_entries(t_entry *entries, int flags)
 					perms[j + 1] = '-';
 				j++;
 			}
+			if (st.st_mode & S_ISVTX)
+				perms[9] = (perms[9] == 'x') ? 't' : 'T';
+			if (st.st_mode & S_ISUID)
+				perms[3] = (perms[3] == 'x') ? 's' : 'S';
+			if (st.st_mode & S_ISGID)
+				perms[6] = (perms[6] == 'x') ? 's' : 'S';
 			perms[10] = '\0';
 
 			pwd = getpwuid(st.st_uid);
