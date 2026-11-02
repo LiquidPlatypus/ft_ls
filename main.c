@@ -1,18 +1,24 @@
 #include "ft_ls.h"
 
-
+/**
+ * @brief perform the ls logic
+ * @param flags flags given when called
+ * @param path path on which is performed ls
+ * @param path_count how many paths
+ * @return int representing how the function performed
+ */
 int ls(int flags, char *path, int path_count) {
 
-	DIR				*dir;
-	struct dirent	*entry;
-	t_entry			*entries;
+	DIR				*dir;		// Opened directory
+	struct dirent	*entry;		// Readed entry
+	t_entry			*entries;	// Name of the entry + full path
 	int				count;
 	int				i;
 	char			*tmp;
 
 
-	struct stat st;
-	int lstat_result = lstat(path, &st);
+	struct stat st;				// File infos
+	int lstat_result = lstat(path, &st);	// Read and write file info
 	int saved_errno = errno; // Save errno in case lstat fails
 	if (lstat_result == 0 && !S_ISDIR(st.st_mode)) {
 		t_entry single[2];

@@ -1,6 +1,11 @@
 #include "ft_ls.h"
 
-
+/**
+ * @brief parse the args and flags
+ * @param ac number of args
+ * @param av list of args
+ * @return flags and args
+ */
 t_args parse_args(int ac, char **av)
 {
 	t_args	args;
@@ -52,6 +57,12 @@ t_args parse_args(int ac, char **av)
 }
 
 
+/**
+ * @brief compare entry based on ASCII
+ * @param a first element
+ * @param b second element
+ * @return result of comparison
+ */
 int compare(const void *a, const void *b) {
 	t_entry *ea;
 	t_entry *eb;
@@ -62,11 +73,23 @@ int compare(const void *a, const void *b) {
 }
 
 
+/**
+ * @brief compare paths based on ASCII
+ * @param a first element
+ * @param b second element
+ * @return result of comparison
+ */
 int compare_paths(const void *a, const void *b) {
 	return ft_strncmp(*(char **)a, *(char **)b, SIZE_MAX);
 }
 
 
+/**
+ * @brief compare time of two elements
+ * @param a first element
+ * @param b second element
+ * @return bool to know which element is older/newer
+ */
 int compare_time(const void *a, const void *b) {
 	t_entry	*ea = (t_entry *)a;
 	t_entry	*eb = (t_entry *)b;
@@ -85,6 +108,11 @@ int compare_time(const void *a, const void *b) {
 }
 
 
+/**
+ * @brief reverse list of paths
+ * @param entries all paths
+ * @param count how many paths
+ */
 void reverse_entries(t_entry *entries, int count)
 {
 	int   i;
@@ -101,6 +129,11 @@ void reverse_entries(t_entry *entries, int count)
 }
 
 
+/**
+ * @brief perform the printing logic
+ * @param entries all paths
+ * @param flags flags
+ */
 void print_entries(t_entry *entries, int flags)
 {
 	int i;
@@ -202,8 +235,7 @@ void print_entries(t_entry *entries, int flags)
 			display_name = quote_name(entries[i].name);
 			if (i == 0)
 				printf("%s", display_name);
-			else
-				printf("  %s", display_name);
+			else0
 			free(display_name);
 			i++;
 		}
@@ -213,6 +245,11 @@ void print_entries(t_entry *entries, int flags)
 }
 
 
+/**
+ * @brief put quote around name if needed
+ * @param name name
+ * @return quoted name
+ */
 char *quote_name(const char *name)
 {
 	char *tmp;

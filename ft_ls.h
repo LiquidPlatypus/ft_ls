@@ -12,15 +12,19 @@
 
 # include "libft/libft.h"
 
+// 6 months in seconds, for printing conversion
 # define SIX_MONTHS 15778476
 
+// Basic boolean
 enum e_bool {
 	FALSE,
 	TRUE
 };
 
+// All supported flags
 # define VALID_OPTIONS "lRrat"
 
+// Bits for flags
 enum e_args {
 	l = 1 << 0,
 	R = 1 << 1,
@@ -29,11 +33,13 @@ enum e_args {
 	t = 1 << 4
 };
 
+// Struct regrouping flags and args
 typedef struct s_args {
 	int		flags;
 	char	**paths;
 } t_args;
 
+// Struct regrouping name and full path for each entry
 typedef struct s_entry {
 	char	*name;
 	char	*fullpath;
