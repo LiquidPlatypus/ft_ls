@@ -11,6 +11,8 @@ OBJS = ${SRCS:.c=.o}
 
 all:	${NAME} ${OBJS}
 
+${OBJS}: ft_ls.h
+
 $(NAME): $(OBJS)
 		@ ${MAKE} -C ./libft
 		@ ${CC} ${CFLAGS} ${OBJS} ${LIBFT} -o ${NAME}
