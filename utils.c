@@ -181,15 +181,8 @@ void print_entries(t_entry *entries, int flags)
 			else
 				strftime(buffer, sizeof(buffer), "%b %e %H:%M", tm_info);
 
-			if (!display_name) {
-				if (ft_strchr(entries[i].name, ' ')) {
-					char *tmp = ft_strjoin("\'", entries[i].name);
-					display_name = ft_strjoin(tmp, "\'");
-					free(tmp);
-				}
-				else
-					display_name = ft_strdup(entries[i].name);
-			}
+			if (!display_name)
+				display_name = quote_name(entries[i].name);
 
 			printf("%s %ld %s %s %ld %s %s\n", perms, st.st_nlink, user_name,
 									group_name, st.st_size, buffer, display_name);
@@ -205,15 +198,8 @@ void print_entries(t_entry *entries, int flags)
 		i = 0;
 		while (entries[i].name != NULL) {
 			char *display_name;
-			char *tmp;
 
-			if (ft_strchr(entries[i].name, ' ')) {
-				tmp = ft_strjoin("'", entries[i].name);
-				display_name = ft_strjoin(tmp, "'");
-				free(tmp);
-			}
-			else
-				display_name = ft_strdup(entries[i].name);
+			display_name = quote_name(entries[i].name);
 			if (i == 0)
 				printf("%s", display_name);
 			else
@@ -227,14 +213,21 @@ void print_entries(t_entry *entries, int flags)
 }
 
 
-char *quote_name(const char *name) {
+char *quote_name(const char *name)
+{
 	char *tmp;
 	char *quoted_name;
+	char *quote;
 
-	if (!ft_strchr(name, ' '))
+	if (!ft_strchr(name, ' ') && !ft_strchr(name, '\'')
+		&& !ft_strchr(name, '"'))
 		return (ft_strdup(name));
-	tmp = ft_strjoin("'", name);
-	quoted_name = ft_strjoin(tmp, "'");
+	if (ft_strchr(name, '\''))
+		quote = "\"";
+	else
+		quote = "'";
+	tmp = ft_strjoin(quote, name);
+	quoted_name = ft_strjoin(tmp, quote);
 	free(tmp);
 	return (quoted_name);
 }
