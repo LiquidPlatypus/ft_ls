@@ -235,7 +235,7 @@ void print_entries(t_entry *entries, int flags)
 			display_name = quote_name(entries[i].name);
 			if (i == 0)
 				printf("%s", display_name);
-			else0
+			else
 			free(display_name);
 			i++;
 		}
