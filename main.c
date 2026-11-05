@@ -150,15 +150,43 @@ int main(int ac, char **av) {
 		i++;
 	}
 	args.paths[j] = NULL;
+
+	i = 0;
+	t_entry	*files = malloc(sizeof(t_entry) * (j + 1));
+	char	**dirs = malloc(sizeof(char *) * (j + 1));
+	int		nb_files = 0;
+	int		nb_dirs = 0;
+
+	// Split paths: non-directories on one side, directories on the other
 	i = 0;
 	while (args.paths[i] != NULL) {
-		// Blank line between the listings of two different paths, like the real ls.
-		if (i > 0)
+		if (lstat(args.paths[i], &st) == 0 && !S_ISDIR(st.st_mode)) {
+			files[nb_files].name = args.paths[i];
+			files[nb_files].fullpath = args.paths[i];
+			nb_files++;
+		}
+		else
+			dirs[nb_dirs++] = args.paths[i];
+		i++;
+	}
+	files[nb_files].name = NULL;
+	files[nb_files].fullpath = NULL;
+
+	// All files printed together, in a single call
+	if (nb_files > 0)
+		print_entries(files, args.flags);
+
+	// Then each directory, separated by a blank line
+	i = 0;
+	while (i < nb_dirs) {
+		if (nb_files > 0 || i > 0)
 			printf("\n");
-		if (ls(args.flags, args.paths[i], path_count))
+		if (ls(args.flags, dirs[i], path_count))
 			exit_code = 2;
 		i++;
 	}
+	free(files);
+	free(dirs);
 
 	free(args.paths);
 	return exit_code;
